@@ -23,7 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../todo-list/todo-list.html">
 <link rel="import" href="../todo-input/todo-input.html">
 <link rel="import" href="../todo-icons/todo-icons.html">
-
+<link rel="import" href="../todo-dialog/todo-dialog.html">
 
 <dom-module id="todo-view">
 
@@ -179,6 +179,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-header-panel>
     </paper-drawer-panel>
 
+    <todo-dialog id="dialog"
+                 opened="{{_isDialogOpen}}"
+                 title="{{_eventTitle}}"></todo-dialog>
   </template>
   <script>
     Polymer({
@@ -189,15 +192,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         route: String,
 
-        todos: Array
+        todos: Array,
+
+        _isDialogOpen: Boolean,
+        _eventTitle: String
 
       },
 
       addTodo: function(e) {
-        this.push('todos', {
-          label: e.detail.value,
-          isComplete: false
-        });
+//        this.push('todos', {
+//          label: e.detail.value,
+//          message: 'hello world!',
+//          guestList: ['john@gmail.com', 'alice@gmail.com'],
+//          isComplete: false
+//        });
+        this._eventTitle = e.detail.value;
+        this._isDialogOpen =  true;
       },
 
       deleteTodo: function(e) {

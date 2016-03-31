@@ -1,0 +1,206 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/gold-email-input/gold-email-input.html">
+
+<dom-module id="todo-dialog">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+
+      .input-wrapper {
+        padding-left: 70px;
+      }
+
+      paper-input {
+        display: inline-block;
+        width: 65%;
+        --paper-input-container: {
+          padding-bottom: 0;
+        };
+
+        /* These styles are not DRY :( */
+        --paper-input-container-label: {
+          font-size: 20px;
+          font-family: 'Roboto Slab', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+          font-weight: normal;
+          color: #9E9E9E;
+        };
+        --paper-input-container-input: {
+          font-size: 20px;
+          font-family: 'Roboto Slab', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        };
+        --paper-input-container-underline: {
+          top: 7px;
+          background: #9E9E9E;
+        };
+        --paper-input-container-underline-focus: {
+          top: 7px;
+        };
+      }
+
+      paper-input[focused] + paper-button,
+      paper-button[focused] {
+        background: var(--default-primary-color);
+        color: var(--text-primary-color);
+      }
+
+      paper-button {
+        background: #E0E0E0;
+        color: #9E9E9E;
+        font-size: 14px;
+      }
+
+      paper-button[focused] {
+        /* https://github.com/PolymerElements/paper-button/pull/43 */
+        outline-width: 3px;
+      }
+
+      paper-listbox {
+        --paper-listbox: {
+          max-height: 300px;
+          overflow-y: scroll;
+        };
+      }
+
+      gold-email-input {
+        padding-bottom: 10px;
+      }
+    </style>
+
+    <paper-dialog opened="{{opened}}">
+      <div class="content">
+        <iron-pages id="pages" selected="0">
+          <section>
+            <h1>What's the occasion?</h1>
+            <paper-input label="Title" value="{{title}}" required></paper-input>
+            <paper-input label="Event Type" list="event-types"></paper-input>
+            <datalist id="event-types">
+              <option value="Birthday"></option>
+              <option value="Business"></option>
+              <option value="Other"></option>
+            </datalist>
+          </section>
+
+          <section>
+            <h1>When and where is it?</h1>
+            <paper-input type="datetime-local" label="Start date" required></paper-input>
+            <paper-input type="datetime-local" label="End date" required></paper-input>
+            <paper-input label="Location" required></paper-input>
+          </section>
+
+          <section>
+            <h1>Who would you like to invite?</h1>
+            <gold-email-input label="john.doe@gmail.com"
+                              on-keydown="_onKeyDownEmail"
+                              error-message="Invalid email address"
+                              auto-validate
+                              no-label-float
+                              required></gold-email-input>
+            <span>Guests: {{guests.length}}</span>
+            <template is="dom-if" if="{{guests}}">
+              <paper-listbox>
+                <template is="dom-repeat" items="{{guests}}">
+                  <paper-item>
+                    <span class="flex">{{item}}</span>
+                    <iron-icon icon="close" on-tap="_onTapRemoveGuest" data-email="{{item}}"></iron-icon>
+                  </paper-item>
+                </template>
+              </paper-listbox>
+            </template>
+          </section>
+
+        </iron-pages>
+      </div>
+      <div class="buttons">
+        <paper-button on-tap="selectPrev">Back</paper-button>
+        <paper-button on-tap="selectNext">Next</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+
+    is: 'todo-dialog',
+
+    properties: {
+      route: {
+        type: String,
+        value: function() {
+          return 'primary';
+        }
+      },
+      title: String,
+
+      guests: {
+        type: Array,
+        value: function() {
+          return [];
+        },
+        notify: true
+      },
+
+      opened: {
+        type: Boolean,
+        value: function() {
+          return false;
+        },
+        notify: true
+      }
+    },
+
+    /**
+     * Handles key-presses on email-input
+     */
+    _onKeyDownEmail: function(e) {
+      if (e.keyCode == 13 && e.target.validate()) {
+        this._addGuest(e.target.value);
+      }
+    },
+
+    /**
+     * Handles taps on the remove button
+     */
+    _onTapRemoveGuest: function(e) {
+      this._removeGuest(e.target.dataEmail);
+    },
+
+    /**
+     * Adds an email to the guest list if it doesn't exist already
+     */
+    _addGuest: function(email) {
+      if (this.guests.indexOf(email) == -1) {
+        this.push('guests', email);
+      }
+    },
+
+    _removeGuest: function(email) {
+      this.arrayDelete('guests', email);
+    },
+
+    /**
+     * Selects the next dialog page
+     */
+    selectNext: function() {
+      this.$.pages.selectNext();
+    },
+
+    /**
+     * Selects the previous dialog page
+     */
+    selectPrev: function() {
+      this.$.pages.selectPrevious();
+    },
+  });
+</script>
