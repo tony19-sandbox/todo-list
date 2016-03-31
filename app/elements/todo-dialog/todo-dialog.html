@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
@@ -72,6 +73,8 @@
       }
 
       gold-email-input {
+        display: inline-block;
+        width: 80%;
         padding-bottom: 10px;
       }
     </style>
@@ -99,12 +102,16 @@
 
           <section>
             <h1>Who would you like to invite?</h1>
-            <gold-email-input label="john.doe@gmail.com"
-                              on-keydown="_onKeyDownEmail"
-                              error-message="Invalid email address"
-                              auto-validate
-                              no-label-float
-                              required></gold-email-input>
+            <div>
+              <gold-email-input id="email"
+                                label="john@gmail.com"
+                                on-keydown="_onKeyDownEmail"
+                                error-message="Invalid email address"
+                                auto-validate
+                                no-label-float
+                                required></gold-email-input>
+              <paper-icon-button icon="add-box" on-tap="_onTapAddGuest"></paper-icon-button>
+            </div>
             <span>Guests: {{guests.length}}</span>
             <template is="dom-if" if="{{guests}}">
               <paper-listbox>
@@ -164,8 +171,17 @@
      * Handles key-presses on email-input
      */
     _onKeyDownEmail: function(e) {
-      if (e.keyCode == 13 && e.target.validate()) {
-        this._addGuest(e.target.value);
+      if (e.keyCode == 13) {
+        this._onTapAddGuest();
+      }
+    },
+
+    /**
+     * Handles the add-icon tap
+     */
+    _onTapAddGuest: function() {
+      if (this.$.email.validate()) {
+        this._addGuest(this.$.email.value);
       }
     },
 
